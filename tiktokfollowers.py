@@ -40,7 +40,7 @@ def procuser(userobj):
 
 def getuserstats():
     users = loadusers()
-    slackmsg = ""
+    slackmsg = ":clock5: Hourly Follower Stats :clock6:\n"
     for user in users:
         print(user)
         result = procuser(user)
