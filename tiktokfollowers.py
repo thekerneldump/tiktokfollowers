@@ -1,0 +1,58 @@
+import json
+import os
+from datetime import datetime
+import requests
+
+# There is literally no error checking anywhere here...
+# I wrote this kinda quickly...
+
+countikstub = "https://countik.com/api/userinfo/"
+
+def getuserdata(userid):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36",
+    }
+    countikurl = countikstub + userid
+    response = requests.get(url=f'{countikurl}',
+                             headers=headers)
+    userobject = json.loads(response.text)
+    thetimestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+    return userobject
+
+def loadusers():
+    f = open('userlist.json')
+    users = json.load(f)
+    return users
+
+def procuser(userobj):
+    userobject = getuserdata(userobj["userid"])
+    useroutput = {}
+    useroutput["name"] = userobj["name"]
+    useroutput["followerCount"] = userobject["followerCount"]
+    return useroutput
+
+def getuserstats():
+    users = loadusers()
+    slackmsg = ""
+    for user in users:
+        print(user)
+        result = procuser(user)
+        name = result["name"]
+        followers = result["followerCount"]
+        slackmsg += f'{result["name"]}: {result["followerCount"]}\n'
+
+    return slackmsg
+
+def main():
+    slackmsg = getuserstats()
+    slack_key = os.getenv("slack_key")
+    slack_webhook_stub = "https://hooks.slack.com/services/"
+    slack_webhook_url = slack_webhook_stub + slack_key
+    result = requests.post(
+        slack_webhook_url,
+        data='{"text": "' + slackmsg + '"}')
+    print(slackmsg)
+
+
+if __name__ == '__main__':
+    main()
