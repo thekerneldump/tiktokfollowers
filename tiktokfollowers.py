@@ -5,6 +5,7 @@ import requests
 
 # There is literally no error checking anywhere here...
 # I wrote this kinda quickly...
+# API key is retrieved from environment variables.
 
 countikstub = "https://countik.com/api/userinfo/"
 
