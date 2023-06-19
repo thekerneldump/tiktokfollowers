@@ -50,8 +50,7 @@ def getuserstats():
         result = procuser(user)
         name = result["name"]
         followers = result["followerCount"]
-        #with open(f'user-{result["userid"]}.json', 'w') as f:
-        #    json.dump(result, f)
+
         slackmsg += f'{result["name"]} {result["followerCount"]}'
         if "newFollowerCount" in result:
             if int(result["newFollowerCount"]) >= 0:
