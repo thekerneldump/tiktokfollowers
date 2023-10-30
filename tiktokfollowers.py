@@ -9,6 +9,8 @@ import requests
 
 countikstub = "https://countik.com/api/userinfo/"
 
+
+
 def getuserdata(userid):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36",
@@ -21,7 +23,7 @@ def getuserdata(userid):
     return userobject
 
 def loadusers():
-    f = open('userlist.json')
+    f = open('userlist.example')
     users = json.load(f)
     return users
 
