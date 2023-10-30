@@ -33,7 +33,7 @@ def getuserdata(userid):
     return userobject
 
 def loadusers():
-    f = open('userlist.example')
+    f = open('userlist.json')
     users = json.load(f)
     return users
 
