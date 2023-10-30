@@ -16,9 +16,19 @@ def getuserdata(userid):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36",
     }
     countikurl = countikstub + userid
-    response = requests.get(url=f'{countikurl}',
+    tries = range(3)
+    userobject = {'followerCount': 0, 'followingCount': 0, 'heartCount': 0, 'status': 'error', 'videoCount': 0}
+
+    for count in tries:
+        print(f'Try {count} user {userid}...')
+        response = requests.get(url=f'{countikurl}',
                              headers=headers)
-    userobject = json.loads(response.text)
+        if response.status_code == 200:
+            userobject = json.loads(response.text)
+            if userobject["status"] == "success":
+                break
+            else:
+                userobject = {'followerCount': 0, 'followingCount': 0, 'heartCount': 0, 'status': 'error', 'videoCount': 0}
     thetimestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f%z')
     return userobject
 
@@ -88,6 +98,7 @@ def main():
     slackmsg = slackmsgdict["followers"]
     slack_key = os.getenv("slack_key")
     slack_webhook_stub = "https://hooks.slack.com/services/"
+    print(slackmsg)
     slack_webhook_url = slack_webhook_stub + slack_key
     result = requests.post(
         slack_webhook_url,
