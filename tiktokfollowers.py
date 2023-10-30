@@ -33,10 +33,12 @@ def procuser(userobj):
     useroutput["heartCount"] = userobject["heartCount"]
     useroutput["userid"] = userobj["userid"]
     try:
-        with open(f'user-{userobj["userid"]}.json', "r") as userfile:
-            lastoutput = json.load(userfile)
+        with open(f'userdata-{userobj["userid"]}.json', "r") as userfile:
+            lastfulloutput = json.load(userfile)
+            lastoutput = lastfulloutput["latest"]
             useroutput["newFollowerCount"] = int(userobject["followerCount"]) - (lastoutput["followerCount"])
             useroutput["newHeartCount"] = int(userobject["heartCount"]) - (lastoutput["heartCount"])
+            useroutput["alldata"] = lastfulloutput
     except IOError:
         print(f'user-{userobj["userid"]}.json does not exist.')
     return useroutput
@@ -69,6 +71,10 @@ def getuserstats():
         followers = result["heartCount"]
         with open(f'user-{result["userid"]}.json', 'w') as f:
             json.dump(result, f)
+        with open(f'userdata-{result["userid"]}.json', 'w') as f:
+            fullresult = {}
+            fullresult["latest"] = result
+            json.dump(fullresult, f)
         slackmsg += f'{result["name"]} {result["heartCount"]}'
         if "newHeartCount" in result:
             if int(result["newHeartCount"]) >= 0:
