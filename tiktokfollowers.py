@@ -7,15 +7,15 @@ import requests
 # I wrote this kinda quickly...
 # API key is retrieved from environment variables.
 
-countikstub = "https://countik.com/api/userinfo/"
+countikstub = "https://countik.com/api/userinfo"
 
 
 
-def getuserdata(userid):
+def getuserdata(userid,sec_uid):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36",
     }
-    countikurl = countikstub + userid
+    countikurl = countikstub + "?sec_user_id=" + sec_uid
     tries = range(3)
     userobject = {'followerCount': 0, 'followingCount': 0, 'heartCount': 0, 'status': 'error', 'videoCount': 0}
 
@@ -33,12 +33,12 @@ def getuserdata(userid):
     return userobject
 
 def loadusers():
-    f = open('userlist.example')
+    f = open('userlist.json')
     users = json.load(f)
     return users
 
 def procuser(userobj):
-    userobject = getuserdata(userobj["userid"])
+    userobject = getuserdata(userobj["userid"], userobj["sec_uid"])
     useroutput = {}
     useroutput["name"] = userobj["name"]
     useroutput["followerCount"] = userobject["followerCount"]
