@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 import requests
+import time
 
 # There is literally no error checking anywhere here...
 # I wrote this kinda quickly...
@@ -16,10 +17,11 @@ def getuserdata(userid):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36",
     }
     countikurl = countikstub + userid
-    tries = range(3)
+    tries = range(10)
     userobject = {'followerCount': 0, 'followingCount': 0, 'heartCount': 0, 'status': 'error', 'videoCount': 0}
 
     for count in tries:
+        time.sleep(1)
         print(f'Try {count} user {userid}...')
         response = requests.get(url=f'{countikurl}',
                              headers=headers)
