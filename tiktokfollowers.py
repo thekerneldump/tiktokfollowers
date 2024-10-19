@@ -9,18 +9,21 @@ import time
 # API key is retrieved from environment variables.
 
 countikstub = "https://countik.com/api/userinfo"
+countikstub = "https://tiktok.livecounts.io/user/stats/"
 
 
 
 def getuserdata(userid,sec_uid):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36",
+        "origin": "https://tokcounter.com"
     }
 
     countikurl = countikstub + "?sec_user_id=" + sec_uid
+    countikurl = countikstub + userid
     tries = range(10)
 
-    userobject = {'followerCount': 0, 'followingCount': 0, 'heartCount': 0, 'status': 'error', 'videoCount': 0}
+    userobject = {'followerCount': 0, 'followingCount': 0, 'likeCount': 0, 'status': 'error', 'videoCount': 0}
 
     for count in tries:
         time.sleep(1)
@@ -29,11 +32,12 @@ def getuserdata(userid,sec_uid):
                              headers=headers)
         if response.status_code == 200:
             userobject = json.loads(response.text)
-            if userobject["status"] == "success":
+            if userobject["success"] == True:
                 break
             else:
-                userobject = {'followerCount': 0, 'followingCount': 0, 'heartCount': 0, 'status': 'error', 'videoCount': 0}
+                userobject = {'followerCount': 0, 'followingCount': 0, 'likeCount': 0, 'status': 'error', 'videoCount': 0}
     thetimestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+    userobject["userid"] = userid
     return userobject
 
 def loadusers():
@@ -46,13 +50,13 @@ def procuser(userobj):
     useroutput = {}
     useroutput["name"] = userobj["name"]
     useroutput["followerCount"] = userobject["followerCount"]
-    useroutput["heartCount"] = userobject["heartCount"]
+    useroutput["likeCount"] = userobject["likeCount"]
     useroutput["userid"] = userobj["userid"]
     try:
         with open(f'user-{userobj["userid"]}.json', "r") as userfile:
             lastoutput = json.load(userfile)
             useroutput["newFollowerCount"] = int(userobject["followerCount"]) - (lastoutput["followerCount"])
-            useroutput["newHeartCount"] = int(userobject["heartCount"]) - (lastoutput["heartCount"])
+            useroutput["newlikeCount"] = int(userobject["likeCount"]) - (lastoutput["likeCount"])
     except IOError:
         print(f'user-{userobj["userid"]}.json does not exist.')
     return useroutput
@@ -83,16 +87,16 @@ def getuserstats():
         print(user)
         result = procuser(user)
         name = result["name"]
-        followers = result["heartCount"]
+        followers = result["likeCount"]
         with open(f'user-{result["userid"]}.json', 'w') as f:
             json.dump(result, f)
-        slackmsg += f'{result["name"]} {result["heartCount"]}'
-        if "newHeartCount" in result:
-            if int(result["newHeartCount"]) >= 0:
+        slackmsg += f'{result["name"]} {result["likeCount"]}'
+        if "newlikeCount" in result:
+            if int(result["newlikeCount"]) >= 0:
                 slackmsg += '  +'
             else:
                 slackmsg += '  '
-            slackmsg += f'{result["newHeartCount"]}'
+            slackmsg += f'{result["newlikeCount"]}'
         slackmsg += "\n"
     slackmsgdict["likes"] = slackmsg
     return slackmsgdict
